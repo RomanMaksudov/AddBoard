@@ -26,3 +26,5 @@ class Article (models.Model):
 class UserResponse(models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE)
     text = models.TextField()
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
