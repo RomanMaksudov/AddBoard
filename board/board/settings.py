@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
+    'add',
+    'board',
+    'accounts',
+    'fpages',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -138,7 +142,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "/news"
+LOGIN_REDIRECT_URL = "/posts"
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -166,3 +170,12 @@ MANAGERS = (
 ADMINS = (
     ('anton', 'anton@yandex.ru'),
 )
+
+
+CACHES = {
+    'default': {
+        'TIMEOUT': 60,
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+    }
+}

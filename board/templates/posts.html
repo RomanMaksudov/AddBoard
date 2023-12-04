@@ -1,0 +1,79 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Board
+{% endblock title %}
+
+{% load cache %}
+{% cache 300 block content %}
+{% block content %}
+   <h1>Все объявления</h1>
+   <h3>{{ posts|length }}</h3>
+   <hr>
+
+    {# Теперь будем проверять не request.user.is_authenticated, а конкретные права #}
+    {% if perms.add.post_create %}
+    <a href="{% url 'post_create' %}">Добавить объявление</a>
+    {% endif %}
+
+   {% if post %}
+       <table>
+           <tr>
+               <td>Название</td>
+               <td>Дата</td>
+               <td>Превью</td>
+           </tr>
+
+           {# Условие получается составным. #}
+           {% if perms.add.post_edit or perms.add.post_delete %}
+           <td>Действия</td>
+           {% endif %}
+
+           {% for post in posts %}
+           <tr>
+               <td>{{ post.title }}</td>
+               <td>{{ post.dateCreation|date:'d M Y' }}</td>
+               <td>{{ post.text|truncatewords:20 }}</td>
+
+               <td>
+                    {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
+                    {% if perms.add.post_edit %}
+                    <a href="{% url 'post_edit' pk=post.id %}">Изменить</a>
+                    {% endif %}
+                    {% if perms.add.post_delete %}
+                    <a href="{% url 'post_delete' post.id %}">Удалить</a>
+                    {% endif %}
+               </td>
+
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Объявлений нет!</h2>
+   {% endif %}
+
+   {# Добавляем пагинацию на страницу #}
+
+   {# Информация о предыдущих страницах #}
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}
+{% endcache %}
