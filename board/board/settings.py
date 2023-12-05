@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'board',
     'accounts',
     'fpages',
+    'media',
+    'static',
+    'templates',
+    'celery',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -81,6 +85,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 WSGI_APPLICATION = 'board.wsgi.application'
@@ -134,7 +143,7 @@ USE_TZ = True
 STATIC_ROOT = 'static/'
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type
@@ -170,6 +179,13 @@ MANAGERS = (
 ADMINS = (
     ('anton', 'anton@yandex.ru'),
 )
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 CACHES = {
