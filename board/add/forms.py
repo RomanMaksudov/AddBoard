@@ -20,5 +20,3 @@ class ResponseForm(forms.ModelForm):
     class Meta:
         model = UserResponse
         fields = ['text']
-        #widgets = {'res_user': forms.HiddenInput()}
-

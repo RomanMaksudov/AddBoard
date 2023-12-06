@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import (
@@ -51,14 +51,14 @@ class PostDetail(DetailView):
         return self.filterset.qs
 
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
     raise_exception = True
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
 
 
-class PostUpdate(PermissionRequiredMixin, UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
@@ -80,43 +80,26 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
         return super().form_valid(form)
 
 
-class ResponseList(ListView):
+class ResponseList(PermissionRequiredMixin, ListView):
     raise_exception = True
     model = UserResponse
     template_name = 'responses.html'
     context_object_name = 'responses'
     paginate_by = 20
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
 
 
-class ResponseCreate(CreateView):
+class ResponseCreate(PermissionRequiredMixin, CreateView):
     raise_exception = True
     form_class = ResponseForm
     model = UserResponse
     template_name = 'response_create.html'
 
-    def post(self, request, pk, **kwargs):
-        if request.method == 'POST':
-            form = ResponseForm(request.POST or None)
-            post_to_res = get_object_or_404(Post, id=pk)
-            if form.is_valid():
-                f = form.save(commit=False)
-                f.res_user_id = self.request.user.id
-                f.res_post_id = post_to_res.id
-                form.save()
-                return super().form_valid(form)
-            else:
-                return render(request, 'posts/response_create.html', {'form': form})
-        else:
-            form = ResponseForm()
-            return render(request, 'posts/response_create.html', {'form': form})
 
-
-class ResponseDelete(DeleteView):
+class ResponseDelete(PermissionRequiredMixin, DeleteView):
     raise_exception = True
     model = UserResponse
     template_name = 'response_delete.html'
