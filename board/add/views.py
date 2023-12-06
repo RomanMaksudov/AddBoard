@@ -91,6 +91,11 @@ class ResponseList(PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = ResponseFilter(self.request.GET, queryset)
+        return self.filterset.qs
+
 
 class ResponseCreate(PermissionRequiredMixin, CreateView):
     raise_exception = True
